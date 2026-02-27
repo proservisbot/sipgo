@@ -65,7 +65,7 @@ func (t *TLSTransport) CreateConnection(laddr Addr, host string, raddr Addr, han
 
 func (t *TLSTransport) createConnection(laddr *net.TCPAddr, host string, raddr *net.TCPAddr, handler sip.MessageHandler) (Connection, error) {
 	addr := raddr.String()
-	t.log.Debug("Dialing new connection", "raddr", addr, "host", host)
+	t.log.Debug("Dialing new connection", "raddr", addr, "host", host, "laddr", laddr)
 
 	//TODO does this need to be each config
 	// SHould we make copy of rootPool?

@@ -319,6 +319,7 @@ func (l *Layer) ClientRequestConnection(req *sip.Request) (c Connection, err err
 		viaHop.Params.Add("alias", "")
 		addr := raddr.String()
 		c, _ := transport.GetConnection(addr)
+		l.log.Debug("Connection pool lookup", "addr", addr, "found", c != nil)
 		if c != nil {
 			// Update Via sent by
 			// TODO avoid this parsing
