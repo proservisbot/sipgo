@@ -80,6 +80,12 @@ func (t *TCPTransport) GetConnection(addr string) (Connection, error) {
 	return c, nil
 }
 
+func (t *TCPTransport) GetConnectionByIP(ip string) (Connection, error) {
+	t.log.Debug("Getting connection by IP", "ip", ip)
+	c := t.pool.GetByIP(ip)
+	return c, nil
+}
+
 func (t *TCPTransport) CreateConnection(laddr Addr, host string, raddr Addr, handler sip.MessageHandler) (Connection, error) {
 	// We are letting transport layer to resolve our address
 	// raddr, err := net.ResolveTCPAddr("tcp", addr)

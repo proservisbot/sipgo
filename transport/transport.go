@@ -36,6 +36,7 @@ const (
 type Transport interface {
 	Network() string
 	GetConnection(addr string) (Connection, error)
+	GetConnectionByIP(ip string) (Connection, error)
 	CreateConnection(laddr Addr, host string, raddr Addr, handler sip.MessageHandler) (Connection, error)
 	String() string
 	Close() error

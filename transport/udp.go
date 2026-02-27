@@ -105,6 +105,21 @@ func (t *UDPTransport) GetConnection(addr string) (Connection, error) {
 	return nil, nil
 }
 
+func (t *UDPTransport) GetConnectionByIP(ip string) (Connection, error) {
+	t.log.Debug("Getting connection by IP", "ip", ip)
+	c := t.pool.GetByIP(ip)
+	if c != nil {
+		return c, nil
+	}
+	// Fallback to listener if no specific connection found
+	t.mu.Lock()
+	defer t.mu.Unlock()
+	if len(t.listeners) > 0 {
+		return t.listeners[0], nil
+	}
+	return nil, nil
+}
+
 // CreateConnection will create new connection
 func (t *UDPTransport) CreateConnection(laddr Addr, host string, raddr Addr, handler sip.MessageHandler) (Connection, error) {
 	// raddr, err := net.ResolveUDPAddr("udp", addr)

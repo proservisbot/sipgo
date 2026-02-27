@@ -361,6 +361,25 @@ func (l *Layer) ClientRequestConnection(req *sip.Request) (c Connection, err err
 			viaHop.Port = port
 			return c, nil
 		}
+		// Try to find any connection to the same IP (for SBC connection reuse)
+		remoteHost, _, _ := sip.ParseAddr(addr)
+		l.log.Debug("Connection pool lookup by IP", "host", remoteHost)
+		c = transport.GetConnectionByIP(remoteHost)
+		if c != nil {
+			l.log.Debug("Found connection by IP", "host", remoteHost)
+			laddr := c.LocalAddr()
+			network := laddr.Network()
+			laddrStr := laddr.String()
+			host, port, err := sip.ParseAddr(laddrStr)
+			if err != nil {
+				return nil, fmt.Errorf("fail to parse local connection address network=%s addr=%s: %w", network, laddrStr, err)
+			}
+			if viaHop.Host == "" {
+				viaHop.Host = host
+			}
+			viaHop.Port = port
+			return c, nil
+		}
 		l.log.Debug("Active connection not found", "addr", addr)
 	}
 

@@ -2,6 +2,7 @@ package transport
 
 import (
 	"log/slog"
+	"net"
 	"sync"
 )
 
@@ -78,6 +79,27 @@ func (p *ConnectionPool) Clear() {
 	p.m = make(map[string]Connection)
 }
 
+// GetByIP returns any connection to the given IP (ignoring port)
+// Used for connection reuse when sending requests back to same host
+func (p *ConnectionPool) GetByIP(ip string) (c Connection) {
+	p.RLock()
+	defer p.RUnlock()
+	for addr, conn := range p.m {
+		// Extract IP from address (format is ip:port)
+		host, _, err := net.SplitHostPort(addr)
+		if err != nil {
+			// Fallback: try direct match
+			host = addr
+		}
+		if host == ip {
+			conn.Ref(1)
+			return conn
+		}
+	}
+	return nil
+}
+
+// Size returns the number of connections in the pool
 func (p *ConnectionPool) Size() int {
 	p.RLock()
 	l := len(p.m)

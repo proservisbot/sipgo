@@ -210,6 +210,12 @@ func (t *WSTransport) GetConnection(addr string) (Connection, error) {
 	return c, nil
 }
 
+func (t *WSTransport) GetConnectionByIP(ip string) (Connection, error) {
+	t.log.Debug("Getting connection by IP", "ip", ip)
+	c := t.pool.GetByIP(ip)
+	return c, nil
+}
+
 func (t *WSTransport) CreateConnection(laddr Addr, host string, raddr Addr, handler sip.MessageHandler) (Connection, error) {
 	// raddr, err := net.ResolveTCPAddr("tcp", addr)
 	// if err != nil {
