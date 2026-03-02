@@ -31,7 +31,7 @@ type Layer struct {
 	log *slog.Logger
 }
 
-func NewLayer(tpl *transport.Layer) *Layer {
+func NewLayer(log *slog.Logger, tpl *transport.Layer) *Layer {
 	txl := &Layer{
 		tpl:                tpl,
 		clientTransactions: newTransactionStore(),
@@ -40,7 +40,10 @@ func NewLayer(tpl *transport.Layer) *Layer {
 		reqHandler:    defaultRequestHandler,
 		unRespHandler: defaultUnhandledRespHandler,
 	}
-	txl.log = slog.With("caller", "transaction.Layer")
+	if log == nil {
+		log = slog.Default()
+	}
+	txl.log = log.With("caller", "transaction.Layer")
 	//Send all transport messages to our transaction layer
 	tpl.OnMessage(txl.handleMessage)
 	return txl

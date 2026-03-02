@@ -51,6 +51,7 @@ type Layer struct {
 // sip parser
 // tls config - can be nil to use default tls
 func NewLayer(
+	log *slog.Logger,
 	dnsResolver *net.Resolver,
 	sipparser *sipgo.Parser,
 	tlsConfig *tls.Config,
@@ -62,7 +63,10 @@ func NewLayer(
 		ConnectionReuse: true,
 	}
 
-	l.log = slog.With("caller", "transportlayer")
+	if log == nil {
+		log = slog.Default()
+	}
+	l.log = log.With("caller", "transportlayer")
 
 	// Make some default transports available.
 	l.udp = NewUDPTransport(sipparser)
